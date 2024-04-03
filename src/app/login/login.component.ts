@@ -2,9 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { UserdataService } from '../services/userdata.service';
 import { Login } from './login.model';
 import { Router } from '@angular/router';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-login',
+  standalone: true,
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
@@ -12,33 +16,40 @@ export class LoginComponent implements OnInit {
 
   login = new Login();
   target: any = '';
-
   token: any;
+
+  userForm: FormGroup;
+  isFormSubmitted: boolean = false;
 
   constructor(
 
     private userdata: UserdataService,
     private route: Router
 
-  ) { }
+  ) { 
+
+    this.userForm = new FormGroup ({
+
+      email: new FormControl("", [Validators.required, Validators.email]),
+      password: new FormControl("", [Validators.required, Validators.minLength(6)])
+
+    })
+
+
+  }
 
   ngOnInit(): void {
       
   }
 
   loginUser() {
-    
-    if (this.login.email == undefined || this.login.password == undefined) {
-      
-      this.target= '<div class="alert alert-danger">Erro! Por favor preencha todos os campos.</div>';
-      
-      setTimeout(() => {
 
-      }, 1000);
+    const isFormValid = this.userForm.valid;
 
-      return;
+    this.isFormSubmitted = true;
 
-    }
+    this.login.email = this.userForm.controls['email'].value;
+    this.login.password = this.userForm.controls['password'].value;
 
     this.userdata.loginUser(this.login).subscribe( (response: any) => {
 
@@ -57,16 +68,40 @@ export class LoginComponent implements OnInit {
 
         this.target = '<div class="alert alert-success">Sucesso! ' + response.message + '</div>';
 
-        this.route.navigate(['dashboard']);
+        setTimeout(() => {
+          
+          this.route.navigate(['dashboard']);
+
+        }, 2000);
 
       }
 
       else {
 
-        this.target = '<div class="alert alert-danger">Erro! ' + response.error + '</div>';
+        if(response.error.email && response.error.password)
+        
+        this.target = '<div class="alert alert-danger">Erro! ' + response.error.email + ' | ' + response.error.password + '</div>';
+
+        else if(response.error.email)
+
+        this.target = '<div class="alert alert-danger">Erro! ' + response.error.email + '</div>';
+
+        else if(response.error.password)
+
+        this.target = '<div class="alert alert-danger">Erro! ' + response.error.password + '</div>';
 
       }
 
+    }, error => {
+      
+      console.log(error);
+
+      if(error) {
+
+        this.target = '<div class="alert alert-danger">Erro! ' + error.error.message + '</div>';
+
+      }
+      
     });
 
   }

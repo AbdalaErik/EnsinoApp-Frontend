@@ -122,11 +122,11 @@ constructor(private http: HttpClient, private router: Router, private userdata: 
     
     if (c) {
 
+      console.log(localStorage.getItem('token'));
+
       this.userdata.logoutUser(localStorage.getItem('token')).subscribe((response: any) => {
 
-        setTimeout(() => {
-
-        }, 1000);
+        console.log(localStorage.getItem('token'));
 
         if(response.code == 1) {
 

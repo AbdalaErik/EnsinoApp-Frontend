@@ -1,19 +1,27 @@
 <div class="container">
-    <div [innerHtml]="target"></div>
-    <form (ngSubmit)="loginUser()">
+    <form [formGroup]="userForm" (ngSubmit)="loginUser()">
         <div class="row">
             <div class="col-sm-3"></div>
             <div class="col-sm-6" style="margin-top: 5%;">
-                <h3 style="text-align: center;">User Login:</h3>
+                <h3 style="text-align: center; margin-bottom: 30px;">Login</h3>
+                <div [innerHtml]="target"></div>
                 <div class="mb-3">
-                    <label for="exampleInputEmail1" class="form-label">Email address</label>
-                    <input type="email" class="form-control" name="name" [(ngModel)]="login.email" aria-describedby="emailHelp">
+                    <label for="exampleInputEmail1" class="form-label">Email</label>
+                    <input type="email" class="form-control" formControlName="email" aria-describedby="emailHelp">
+                    <div class="text-danger" *ngIf="userForm.controls['email'].invalid && (isFormSubmitted || userForm.controls['email'].touched || userForm.controls['email'].dirty)">
+                        <span *ngIf="userForm.controls['email'].errors?.['required']">Campo obrigatório!</span>
+                        <span *ngIf="userForm.controls['email'].errors?.['email']">Formato inválido!</span>
+                    </div>
                 </div>
                 <div class="mb-3">
-                    <label for="exampleInputPassword1" class="form-label">Password</label>
-                    <input type="password" class="form-control" name="name" [(ngModel)]="login.password">
+                    <label for="exampleInputPassword1" class="form-label">Senha</label>
+                    <input type="password" class="form-control" formControlName="password" aria-describedby="passwordHelp">
+                    <div class="text-danger" *ngIf="userForm.controls['password'].invalid && (isFormSubmitted || userForm.controls['password'].touched || userForm.controls['password'].dirty)">
+                        <span *ngIf="userForm.controls['password'].errors?.['required']">Campo obrigatório!</span>
+                        <span *ngIf="userForm.controls['password'].errors?.['minlength']">Mínimo de 6 caracteres obrigatório!</span>
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-primary">Login</button>
+                <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Entrar</button>
             </div>
         </div>
     </form>
